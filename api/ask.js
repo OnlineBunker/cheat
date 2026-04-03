@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     });
 
     const result = await model.generateContent(
-      "Explain this in simple, normal English without headings or formatting:\n\n" +
+      "Explain this in simple, normal English without headings or formatting or give me the direct code :\n\n" +
         question,
     );
 
