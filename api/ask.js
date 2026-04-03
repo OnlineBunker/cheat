@@ -7,18 +7,31 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const question = req.method === "POST"
-    ? req.body?.q
-    : req.query?.q;
+  const question =
+    req.method === "POST"
+      ? req.body?.q
+      : req.query?.q;
 
-  if (!question) return res.status(400).send("No question. Use ?q= or POST { q: '...' }");
+  if (!question) {
+    return res.status(400).json({ error: "No question provided" });
+  }
 
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
+
     const result = await model.generateContent(question);
-    res.status(200).send(result.response.text());
+
+    return res.status(200).json({
+      answer: result.response.text(),
+    });
+
   } catch (err) {
-    res.status(500).send("Error: " + err.message);
+    return res.status(500).json({
+      error: err.message,
+    });
   }
 }
