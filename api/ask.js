@@ -7,10 +7,7 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const question =
-    req.method === "POST"
-      ? req.body?.q
-      : req.query?.q;
+  const question = req.method === "POST" ? req.body?.q : req.query?.q;
 
   if (!question) {
     return res.status(400).json({ error: "No question provided" });
@@ -23,12 +20,14 @@ export default async function handler(req, res) {
       model: "gemini-2.5-flash",
     });
 
-    const result = await model.generateContent(question);
+    const result = await model.generateContent(
+      "Explain this in simple, normal English without headings or formatting:\n\n" +
+        question,
+    );
 
     return res.status(200).json({
       answer: result.response.text(),
     });
-
   } catch (err) {
     return res.status(500).json({
       error: err.message,
